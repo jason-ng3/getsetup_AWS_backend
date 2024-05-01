@@ -1,3 +1,6 @@
+const AWS = require('aws-sdk');
+const sns = new AWS.SNS();
+
 type APIGatewayProxyResult = {
   statusCode: number;
   headers: { [key: string]: string };
@@ -20,14 +23,34 @@ export async function handler(event: any): Promise<APIGatewayProxyResult> {
     throw new Error('Error parsing request body as JSON: ' + error.message);
   }
 
-  const { num1, num2 } = parsedBody;
+  const { num1, num2, slackChannel } = parsedBody;
   const result = num1 * num2;
 
-  return {
+  const slackResponse = {
+    message: `Calculated result: ${num1} * ${num2} = ${result}`,
+    slackChannel: slackChannel,
+  };
+
+  const apiResponse = {
     statusCode: 200,
     headers: {
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ result })
   };
+
+  if (slackChannel) {
+    const topicList = await sns.listTopics().promise();
+    const topic = topicList.Topics.find((t: any) => t.TopicArn && t.TopicArn.includes('SlackNotificationTopic'));
+    if (topic && topic.TopicArn) {
+      await sns.publish({
+        Message: JSON.stringify(slackResponse),
+        TopicArn: topic.TopicArn,
+      }).promise();
+    } else {
+      throw new Error('No valid SNS topic found');
+    }
+  }
+  
+  return apiResponse;
 }

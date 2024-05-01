@@ -2,9 +2,15 @@
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { GetsetupApiStack } from '../lib/getsetup_api-stack';
+import { SlackNotifierStack } from '../lib/slack-notifier-stack';
 
 const app = new cdk.App();
-new GetsetupApiStack(app, 'GetsetupApiStack', {
+
+const slackNotifierStack = new SlackNotifierStack(app, 'SlackNotifierStack', {});
+const slackNotificationTopicArn = cdk.Fn.importValue('SlackNotifierStack-SlackNotificationTopicARN');
+
+let apiStack = new GetsetupApiStack(app, 'GetsetupApiStack', {
+  slackNotificationTopicArn: slackNotificationTopicArn
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -19,3 +25,5 @@ new GetsetupApiStack(app, 'GetsetupApiStack', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+apiStack.node.addDependency(slackNotifierStack);

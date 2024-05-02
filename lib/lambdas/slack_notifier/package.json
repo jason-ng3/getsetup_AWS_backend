@@ -1,0 +1,7 @@
+{
+  "name": "slack-notifier-lambda",
+  "version": "1.0.0",
+  "dependencies": {
+    "@slack/client": "^5.0.2"
+  }
+}

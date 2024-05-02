@@ -28,6 +28,9 @@
     "@aws-cdk/aws-sns": "^1.204.0",
     "@aws-cdk/aws-sns-subscriptions": "^1.204.0",
     "@aws-cdk/core": "^1.204.0",
+    "@slack/client": "^5.0.2",
+    "@types/aws-lambda": "^8.10.137",
+    "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1611.0",
     "path": "^0.12.7",
     "source-map-support": "^0.5.21"
